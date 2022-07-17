@@ -1,12 +1,4 @@
 
-main points:
-steps how project will work
-
-step1: Participants must hava a wallet.
-step2: A participant can transfer ether more then one time but the transfer ether must be 2 ether.
-step3: As the participant will transfer ether it's address will be registerd.
-step4: The contract will be reset one's the round is complete.
-
 //SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.5.0 <0.9.0;
 contract lottery{
