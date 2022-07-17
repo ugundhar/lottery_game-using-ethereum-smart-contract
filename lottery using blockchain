@@ -1,0 +1,45 @@
+
+main points:
+steps how project will work
+
+step1: Participants must hava a wallet.
+step2: A participant can transfer ether more then one time but the transfer ether must be 2 ether.
+step3: As the participant will transfer ether it's address will be registerd.
+step4: The contract will be reset one's the round is complete.
+
+//SPDX-License-Identifier: GPL-3.0
+pragma solidity >=0.5.0 <0.9.0;
+contract lottery{
+    address public manager;//state vairable with setter funciton
+    address payable[] public participant;// state variabel with payable function
+    constructor(){
+        manager=msg.sender; //manager can access the data
+
+    }
+    receive() external payable{
+        require(msg.value==1 ether);
+        participant.push(payable(msg.sender));//adding participand address to payable list
+    }
+    function check_balance() public view returns(uint){//for checking the balance
+        require(msg.sender==manager);
+        return address(this).balance;//this particular address sended how much money by using this line
+    }
+    function random_paticipant_winner() public view returns(uint){
+        return uint(keccak256(abi.encodePacked(block.difficulty,block.timestamp,participant.length)));
+    }
+    function lottery_winner() public{//lottery function
+        require(msg.sender==manager);// only manager can select the wiiner
+        require(participant.length>=3);//if condition participants length should be greater then 3
+        uint r=random_paticipant_winner();//random number is stored in r
+        address payable winner;// for winner we have to transfer entire money
+        uint index=r%participant.length;
+        winner=participant[index];
+        winner.transfer(check_balance());// transfering balance to the winner
+        participant=new address payable[](0);//for new lottery
+
+
+
+    }
+
+    
+}
