@@ -1,37 +1,36 @@
-
-//SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.5.0 <0.9.0;
-contract lottery{
-    address public manager;//state vairable with setter funciton
-    address payable[] public participant;// state variabel with payable function
-    constructor(){
-        manager=msg.sender; //manager can access the data
 
-    }
-    receive() external payable{
-        require(msg.value==1 ether);
-        participant.push(payable(msg.sender));//adding participand address to payable list
-    }
-    function check_balance() public view returns(uint){//for checking the balance
-        require(msg.sender==manager);
-        return address(this).balance;//this particular address sended how much money by using this line
-    }
-    function random_paticipant_winner() public view returns(uint){
-        return uint(keccak256(abi.encodePacked(block.difficulty,block.timestamp,participant.length)));
-    }
-    function lottery_winner() public{//lottery function
-        require(msg.sender==manager);// only manager can select the wiiner
-        require(participant.length>=3);//if condition participants length should be greater then 3
-        uint r=random_paticipant_winner();//random number is stored in r
-        address payable winner;// for winner we have to transfer entire money
-        uint index=r%participant.length;
-        winner=participant[index];
-        winner.transfer(check_balance());// transfering balance to the winner
-        participant=new address payable[](0);//for new lottery
+contract lottery {
+    address public manager; // Declare a state variable to store the address of the contract manager with a public getter function.
+    address payable[] public participant; // Declare a state variable to store the list of participants' addresses with a public getter function that is also payable.
 
-
-
+    constructor() {
+        manager = msg.sender; // Initialize the contract manager with the address of the contract deployer.
     }
 
-    
+    receive() external payable { // A fallback function that allows participants to deposit funds into the contract when they send ETH to the contract address.
+        require(msg.value == 1 ether); // Require that the amount of ETH sent is 1 ether.
+        participant.push(payable(msg.sender)); // Add the address of the sender to the list of participants.
+    }
+
+    function check_balance() public view returns (uint) { // A function that returns the contract balance.
+        require(msg.sender == manager); // Require that the caller is the contract manager.
+        return address(this).balance; // Return the balance of the contract.
+    }
+
+    function random_paticipant_winner() public view returns (uint) { // A function that generates a random number based on block difficulty, timestamp, and the number of participants.
+        return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, participant.length)));
+    }
+
+    function lottery_winner() public { // A function that selects the winner and transfers the contract balance to them.
+        require(msg.sender == manager); // Require that the caller is the contract manager.
+        require(participant.length >= 3); // Require that there are at least three participants in the lottery.
+        uint r = random_paticipant_winner(); // Generate a random number based on the number of participants.
+        address payable winner; // Declare a variable to store the winner's address.
+        uint index = r % participant.length; // Calculate the index of the winner's address in the list of participants.
+        winner = participant[index]; // Assign the winner's address to the variable.
+        winner.transfer(check_balance()); // Transfer the contract balance to the winner.
+        participant = new address payable[](0); // Reset the list of participants to start a new lottery.
+    }
 }
